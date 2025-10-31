@@ -32,6 +32,7 @@ export function ChatSidebar({
     const matchSearch =
       chat.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       chat.lastMessage.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      chat.phone.toLowerCase().includes(searchTerm.toLowerCase()) ||
       chat.messages.some((m) =>
         m.text.toLowerCase().includes(searchTerm.toLowerCase())
       );

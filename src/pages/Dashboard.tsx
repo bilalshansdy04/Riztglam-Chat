@@ -12,16 +12,22 @@ function Dashboard() {
 
   const selectedChat = chats.find((c) => c.id === selectedId) || null;
 
+    const handleSelectChat = (id: number) => {
+    if (selectedId === id) {
+      setSelectedId(null);
+    } else {
+      setSelectedId(id);
+    }
+  };
+
   const handleStatusChange = (newStatus: Chat["status"]) => {
     if (!selectedChat) return;
 
-    // Tentukan pesan sistem
     let systemMsg = "";
     if (newStatus === "Assigned to Human") systemMsg = "🧠 Chat assigned to Human";
     if (newStatus === "Handled by AI") systemMsg = "🤖 Chat returned to AI";
     if (newStatus === "Resolved") systemMsg = "✅ Chat resolved by Human";
 
-    // Update hanya untuk chat yang sedang dipilih
     setChats((prevChats) =>
       prevChats.map((chat) =>
         chat.id === selectedChat.id
@@ -55,7 +61,7 @@ function Dashboard() {
           <ChatSidebar
             chats={chats}
             selectedId={selectedId}
-            onSelect={setSelectedId}
+            onSelect={handleSelectChat}
             globalSearch={searchQuery}
           />
         </div>
