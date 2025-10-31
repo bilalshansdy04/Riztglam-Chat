@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { dummyChats, type Chat } from "@/data/dummyChats";
+import { ChatSidebar } from "@/components/modules/ChatSidebar";
 import { HeaderBar } from "@/components/modules/HeaderBar";
-import { ChatSidebar } from "@/components/modules/ChatSideBar";
 import { ChatWindow } from "@/components/modules/ChatWindow";
 import { ChatInfoPanel } from "@/components/modules/ChatInfoPanel";
 

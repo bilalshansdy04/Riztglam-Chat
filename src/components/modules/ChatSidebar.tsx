@@ -70,6 +70,7 @@ export function ChatSidebar({
               <h4 className="font-medium">{chat.name}</h4>
               <ChatStatusBadge status={chat.status} />
             </div>
+            <p className="text-xs text-gray-500">{chat.phone}</p>
             <p className="text-sm text-gray-600 truncate">{chat.lastMessage}</p>
             <p className="text-xs text-gray-400 text-right mt-1">12:45 PM</p>
           </div>
