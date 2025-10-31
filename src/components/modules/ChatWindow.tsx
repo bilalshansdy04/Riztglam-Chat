@@ -8,50 +8,41 @@ interface ChatWindowProps {
 }
 
 export function ChatWindow({ chat, onStatusChange }: ChatWindowProps) {
-  if (!chat) {
+  if (!chat)
     return (
-      <div className="flex items-center justify-center h-full text-gray-500">
+      <div className="flex items-center justify-center h-full text-gray-400">
         Pilih chat di sebelah kiri
       </div>
     );
-  }
 
   return (
     <div className="flex flex-col h-full">
-      {/* Header */}
-      <div className="p-3 border-b flex justify-between items-center bg-white">
-        <h3 className="font-semibold">{chat.name}</h3>
+      {/* Header Chat */}
+      <div className="p-3 border-b bg-white flex justify-between items-center">
+        <div>
+          <h3 className="font-semibold">{chat.name}</h3>
+          <p className="text-sm text-gray-500">{chat.status}</p>
+        </div>
         <div className="space-x-2">
-          <Button
-            variant="outline"
-            onClick={() => onStatusChange("Assigned to Human")}
-          >
+          <Button variant="outline" onClick={() => onStatusChange("Assigned to Human")}>
             Assign
           </Button>
-          <Button
-            variant="outline"
-            onClick={() => onStatusChange("Handled by AI")}
-          >
+          <Button variant="outline" onClick={() => onStatusChange("Handled by AI")}>
             Unassign
-          </Button>
-          <Button variant="default" onClick={() => onStatusChange("Resolved")}>
-            Resolve
           </Button>
         </div>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 bg-gray-50 space-y-2">
+      <div className="flex-1 overflow-y-auto p-4 bg-gray-50 space-y-3">
         {chat.messages.map((m, i) => (
           <div
             key={i}
-            className={`flex ${
-              m.from === "ai" ? "justify-end" : "justify-start"
-            }`}
+            className={`flex ${m.from === "user" ? "justify-start" : "justify-end"}`}
           >
             <div
               className={`px-3 py-2 rounded-lg max-w-xs ${
-                m.from === "ai"
+                m.from === "user"
                   ? "bg-white border text-gray-800"
                   : "bg-blue-500 text-white"
               }`}
@@ -60,10 +51,22 @@ export function ChatWindow({ chat, onStatusChange }: ChatWindowProps) {
             </div>
           </div>
         ))}
-        <div className="p-3 border-t bg-white flex items-center space-x-2 fixed bottom-0 left-1/3 right-0">
-          <Input type="text" placeholder="Ketik pesan..." className="flex-1" />
-          <Button>Kirim</Button>
-        </div>
+
+        {/* System Messages */}
+        {chat.systemMessages?.map((msg, i) => (
+          <div
+            key={`sys-${i}`}
+            className="text-center text-xs text-gray-500 italic select-none"
+          >
+            {msg}
+          </div>
+        ))}
+      </div>
+
+      {/* Input */}
+      <div className="p-3 border-t bg-white flex items-center space-x-2">
+        <Input placeholder="Ketik pesan..." className="flex-1" />
+        <Button>✉</Button>
       </div>
     </div>
   );
