@@ -9,6 +9,7 @@ export interface Chat {
   lastMessage: string;
   messages: Message[];
   status: "Handled by AI" | "Assigned to Human" | "Resolved";
+  systemMessages?: string[];
 }
 
 export const dummyChats: Chat[] = [
