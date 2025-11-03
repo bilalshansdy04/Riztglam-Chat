@@ -22,8 +22,8 @@ export function ChatInfoPanel({ chat }: ChatInfoPanelProps) {
       <div className="mb-3">
         <h4 className="font-medium mb-1">Labels</h4>
         <div className="flex flex-wrap gap-2">
-          {chat.labels.length > 0 ? (
-            chat.labels.map((label, i) => (
+          {(chat.labels ?? []).length > 0 ? (
+            chat.labels!.map((label, i) => (
               <Badge key={i} variant="secondary">
                 {label}
               </Badge>
@@ -52,8 +52,10 @@ export function ChatInfoPanel({ chat }: ChatInfoPanelProps) {
 
       <div>
         <h4 className="font-medium mb-1">Log Aktivitas</h4>
+        <Textarea value={chat.notes ?? ""} readOnly className="resize-none" />
+
         <ul className="text-xs text-gray-500 space-y-1">
-          {chat.log.map((item, i) => (
+          {(chat.log ?? []).map((item, i) => (
             <li key={i}>• {item}</li>
           ))}
         </ul>
