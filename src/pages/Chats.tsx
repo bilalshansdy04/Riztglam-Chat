@@ -18,11 +18,14 @@ function Chats() {
   );
 
   const handleSelectChat = (id: number) => {
-    if (selectedId === id) {
-      setSelectedId(null);
-    } else {
-      setSelectedId(id);
-    }
+    setChats((prev) =>
+      prev.map((chat) =>
+        chat.id === id
+          ? { ...chat, unreadCount: 0 }
+          : chat
+      )
+    );
+    setSelectedId((prev) => (prev === id ? null : id));
   };
 
   const handleStatusChange = (newStatus: Chat["status"]) => {

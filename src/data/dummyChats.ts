@@ -10,6 +10,7 @@ export type Chat = {
   labels?: string[];
   notes?: string;    
   log?: string[];
+  unreadCount?: number;
 };
 
 export const dummyChats: Chat[] = [
@@ -24,6 +25,7 @@ export const dummyChats: Chat[] = [
       { from: "user", text: "Halo, saya ingin tanya produk skincare." },
       { from: "ai", text: "Tentu! Apa yang bisa saya bantu?" },
     ],
+    unreadCount: 0,
     labels: ["Customer", "New"],
     notes: "Pelanggan baru dari Instagram Ads", 
     log: ["Chat started", "Handled by AI Agent A"], 
@@ -39,6 +41,7 @@ export const dummyChats: Chat[] = [
       { from: "user", text: "Pesanan saya dikirim belum?" },
       { from: "human", text: "Sudah dikirim, silakan cek resi ya." },
     ],
+    unreadCount: 0,
     labels: ["Repeat Customer"],
     notes: "Sudah belanja 3x",
     log: ["Chat assigned to Agent A"],
@@ -54,6 +57,7 @@ export const dummyChats: Chat[] = [
       { from: "user", text: "Bisa ubah alamat pengiriman?" },
       { from: "human", text: "Bisa, saya bantu ubah ya." },
     ],
+    unreadCount: 5,
     labels: ["Repeat Customer"],
     notes: "Sudah belanja 3x",
     log: ["Chat assigned to Agent A"],
@@ -69,6 +73,7 @@ export const dummyChats: Chat[] = [
       { from: "user", text: "Apakah produk A masih tersedia?" },
       { from: "ai", text: "Produk tersedia, silakan checkout." },
     ],
+    unreadCount: 2,
     labels: ["Customer", "New"],
     notes: "Pelanggan baru dari Instagram Ads", 
     log: ["Chat started", "Handled by AI Agent A"], 
@@ -84,6 +89,7 @@ export const dummyChats: Chat[] = [
       { from: "user", text: "Saya ingin refund pesanan yang salah." },
       { from: "human", text: "Kami akan segera proses pengembalian dana." },
     ],
+    unreadCount: 1,
     labels: ["Repeat Customer"],
     notes: "Sudah belanja 3x",
     log: ["Chat assigned to Agent A"],
@@ -99,6 +105,7 @@ export const dummyChats: Chat[] = [
       { from: "user", text: "Bagaimana cara melacak pesanan saya?" },
       { from: "ai", text: "Gunakan nomor resi di halaman pesanan Anda." },
     ],
+    unreadCount: 2,
     labels: ["Repeat Customer"],
     notes: "Sudah belanja 3x",
     log: ["Chat assigned to Agent A"],
@@ -114,6 +121,7 @@ export const dummyChats: Chat[] = [
       { from: "user", text: "Barang yang dikirim rusak, bagaimana ya?" },
       { from: "human", text: "Silakan kirim foto produk yang dimaksud ya." },
     ],
+    unreadCount: 0,
     labels: ["Customer", "New"],
     notes: "Pelanggan baru dari Instagram Ads", 
     log: ["Chat started", "Handled by AI Agent A"], 
@@ -129,6 +137,7 @@ export const dummyChats: Chat[] = [
       { from: "user", text: "Apakah ada promo bulan ini?" },
       { from: "ai", text: "Diskon berlaku hingga 31 Oktober!" },
     ],
+    unreadCount: 4,
     labels: ["Customer", "New"],
     notes: "Pelanggan baru dari Instagram Ads", 
     log: ["Chat started", "Handled by AI Agent A"], 
@@ -144,6 +153,7 @@ export const dummyChats: Chat[] = [
       { from: "user", text: "Bisa tolong ubah ukuran baju saya?" },
       { from: "human", text: "Baik, nanti kami konfirmasi ulang ke Anda." },
     ],
+    unreadCount: 0,
     labels: ["Repeat Customer"],
     notes: "Sudah belanja 3x",
     log: ["Chat assigned to Agent A"],
@@ -159,6 +169,7 @@ export const dummyChats: Chat[] = [
       { from: "user", text: "Bagaimana cara daftar member baru?" },
       { from: "ai", text: "Silakan isi form pendaftaran terlebih dahulu." },
     ],
+    unreadCount: 2,
     labels: ["Repeat Customer"],
     notes: "Sudah belanja 3x",
     log: ["Chat assigned to Agent A"],
