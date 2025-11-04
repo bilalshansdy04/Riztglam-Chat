@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChatStatusBadge } from "@/components/modules/ChatStatusBadge";
 import type { Chat } from "@/data/dummyChats";
 import {
   DropdownMenu,
@@ -12,10 +11,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { CircleCheck, Filter, Mail, MailOpen } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useSidebar } from "@/components/ui/sidebar";
 
 interface ChatSidebarProps {
   chats: Chat[];
@@ -34,15 +38,24 @@ export function ChatSidebar({
   const [localSearch, setLocalSearch] = useState("");
   const [selectedAgent, setSelectedAgent] = useState<string>("All Agents");
   const [showUnreadOnly, setShowUnreadOnly] = useState(false); // 👈 new state
+  const { state } = useSidebar();
 
   const searchTerm = globalSearch || localSearch;
 
   // 🔹 Kelompokkan agents
   const aiAgents = Array.from(
-    new Set(chats.map((c) => c.handledBy).filter((a) => a?.toLowerCase().startsWith("ai agent")))
+    new Set(
+      chats
+        .map((c) => c.handledBy)
+        .filter((a) => a?.toLowerCase().startsWith("ai agent"))
+    )
   );
   const humanAgents = Array.from(
-    new Set(chats.map((c) => c.handledBy).filter((a) => a && !a.toLowerCase().startsWith("ai agent")))
+    new Set(
+      chats
+        .map((c) => c.handledBy)
+        .filter((a) => a && !a.toLowerCase().startsWith("ai agent"))
+    )
   );
 
   const filtered = chats.filter((chat) => {
@@ -53,15 +66,19 @@ export function ChatSidebar({
         ? chat.status === "Handled by AI"
         : chat.status === "Resolved";
 
-    const matchAgent = selectedAgent === "All Agents" || chat.handledBy === selectedAgent;
+    const matchAgent =
+      selectedAgent === "All Agents" || chat.handledBy === selectedAgent;
 
     const matchSearch =
       chat.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       chat.lastMessage.toLowerCase().includes(searchTerm.toLowerCase()) ||
       chat.phone.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      chat.messages.some((m) => m.text.toLowerCase().includes(searchTerm.toLowerCase()));
+      chat.messages.some((m) =>
+        m.text.toLowerCase().includes(searchTerm.toLowerCase())
+      );
 
-    const matchUnread = !showUnreadOnly || (chat.unreadCount && chat.unreadCount > 0); // 👈 filter unread toggle
+    const matchUnread =
+      !showUnreadOnly || (chat.unreadCount && chat.unreadCount > 0); // 👈 filter unread toggle
 
     return matchTab && matchAgent && matchSearch && matchUnread;
   });
@@ -73,7 +90,11 @@ export function ChatSidebar({
         {/* Agent Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="flex items-center gap-2 font-medium">
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2 font-medium"
+            >
               <Filter className="w-4 h-4" />
               {selectedAgent}
             </Button>
@@ -91,7 +112,10 @@ export function ChatSidebar({
                 <DropdownMenuSeparator />
                 <DropdownMenuLabel>AI Agents</DropdownMenuLabel>
                 {aiAgents.map((agent) => (
-                  <DropdownMenuItem key={agent} onClick={() => setSelectedAgent(agent)}>
+                  <DropdownMenuItem
+                    key={agent}
+                    onClick={() => setSelectedAgent(agent)}
+                  >
                     {agent}
                   </DropdownMenuItem>
                 ))}
@@ -103,7 +127,10 @@ export function ChatSidebar({
                 <DropdownMenuSeparator />
                 <DropdownMenuLabel>Human Agents</DropdownMenuLabel>
                 {humanAgents.map((agent) => (
-                  <DropdownMenuItem key={agent} onClick={() => setSelectedAgent(agent)}>
+                  <DropdownMenuItem
+                    key={agent}
+                    onClick={() => setSelectedAgent(agent)}
+                  >
                     {agent}
                   </DropdownMenuItem>
                 ))}
@@ -176,46 +203,50 @@ export function ChatSidebar({
           onChange={(e) => setLocalSearch(e.target.value)}
         />
       </div>
-
+              
       {/* 🔹 Chat List */}
-      <ScrollArea className="flex-1 p-2">
-        {filtered.map((chat) => (
-          <div
-            key={chat.id}
-            onClick={() => onSelect(chat.id)}
-            className={`p-3 rounded-lg border mb-2 cursor-pointer transition-all duration-150 ${
-              selectedId === chat.id
-                ? "bg-blue-100 border-blue-400"
-                : "hover:bg-gray-50"
-            }`}
-          >
-            <div className="flex justify-between items-center mb-1 relative">
-              <h4 className="font-medium truncate pr-6">{chat.name}</h4>
-              <div className="flex items-center gap-1">
-                {Number(chat.unreadCount) > 0 && (
-                  <Badge
-                    className="flex items-center justify-center h-5 min-w-5 rounded-full px-1 font-mono tabular-nums animate-pulse"
-                    variant="destructive"
-                  >
-                    {chat.unreadCount}
-                  </Badge>
-                )}
+      <ScrollArea className="flex-1">
+        <div className="p-2">
+          {filtered.map((chat) => (
+            <div
+              key={chat.id}
+              onClick={() => onSelect(chat.id)}
+              className={`w-full p-3 rounded-lg border mb-2 cursor-pointer transition-all duration-150 ${
+                selectedId === chat.id
+                  ? "bg-blue-100 border-blue-400"
+                  : "hover:bg-gray-50"
+              }`}
+            >
+              <div className="flex justify-between items-center mb-1 relative">
+                <h4 className="font-medium truncate pr-6">{chat.name}</h4>
+                <div className="flex items-center gap-1">
+                  {Number(chat.unreadCount) > 0 && (
+                    <Badge
+                      className="flex items-center justify-center h-5 min-w-5 rounded-full px-1 font-mono tabular-nums animate-pulse"
+                      variant="destructive"
+                    >
+                      {chat.unreadCount}
+                    </Badge>
+                  )}
+                </div>
               </div>
+
+              <p className="text-xs text-gray-500">{chat.phone}</p>
+              <p className="text-sm text-gray-600 truncate">
+                {chat.lastMessage}
+              </p>
+              <p className="text-xs text-gray-400 text-right mt-1">
+                {chat.handledBy}
+              </p>
             </div>
+          ))}
 
-            <p className="text-xs text-gray-500">{chat.phone}</p>
-            <p className="text-sm text-gray-600 truncate">{chat.lastMessage}</p>
-            <p className="text-xs text-gray-400 text-right mt-1">
-              {chat.handledBy}
+          {filtered.length === 0 && (
+            <p className="text-center text-sm text-gray-400 mt-10">
+              No chats found
             </p>
-          </div>
-        ))}
-
-        {filtered.length === 0 && (
-          <p className="text-center text-sm text-gray-400 mt-10">
-            No chats found
-          </p>
-        )}
+          )}
+        </div>
       </ScrollArea>
     </div>
   );

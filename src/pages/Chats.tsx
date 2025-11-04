@@ -1,16 +1,26 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { dummyChats, type Chat } from "@/data/dummyChats";
 import { ChatSidebar } from "@/components/modules/ChatSidebar";
-import { HeaderBar } from "@/components/modules/HeaderBar";
 import { ChatWindow } from "@/components/modules/ChatWindow";
 import { ChatInfoPanel } from "@/components/modules/ChatInfoPanel";
+import { useSidebar } from "@/components/ui/sidebar";
 
 function Chats() {
   const [selectedId, setSelectedId] = useState<number | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery] = useState("");
+  const [isMobile, setIsMobile] = useState(false);
   const [chats, setChats] = useState<Chat[]>(
     dummyChats.map((c) => ({ ...c, systemMessages: c.systemMessages ?? [] }))
   );
+  const { state } = useSidebar();
+
+  // ✅ Responsiveness: deteksi jika width < 1024
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const selectedChat = useMemo(
     () => chats.find((c) => c.id === selectedId) || null,
@@ -19,14 +29,12 @@ function Chats() {
 
   const handleSelectChat = (id: number) => {
     setChats((prev) =>
-      prev.map((chat) =>
-        chat.id === id
-          ? { ...chat, unreadCount: 0 }
-          : chat
-      )
+      prev.map((chat) => (chat.id === id ? { ...chat, unreadCount: 0 } : chat))
     );
-    setSelectedId((prev) => (prev === id ? null : id));
+    setSelectedId(id);
   };
+
+  const handleBackToList = () => setSelectedId(null);
 
   const handleStatusChange = (newStatus: Chat["status"]) => {
     if (!selectedChat) return;
@@ -56,38 +64,60 @@ function Chats() {
     );
   };
 
-  const handleResolve = () => {
-    handleStatusChange("Resolved");
-  };
 
   return (
-    <div className="w-full">
-      <div className="flex flex-col h-screen">
-        <HeaderBar
-          onResolve={handleResolve}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          selectedChatName={selectedChat?.name || null}
-        />
-        <div className="flex flex-1 overflow-hidden">
-          <div className="w-1/4">
-            <ChatSidebar
-              chats={chats}
-              selectedId={selectedId}
-              onSelect={handleSelectChat}
-              globalSearch={searchQuery}
-            />
-          </div>
-          <div className="flex-1 border-x bg-gray-50">
-            <ChatWindow
-              chat={selectedChat}
-              onStatusChange={handleStatusChange}
-            />
-          </div>
-          <div className="w-1/4">
-            <ChatInfoPanel chat={selectedChat} />
-          </div>
-        </div>
+    <div className="w-full h-[90vh] flex flex-col">
+      {/* 🔹 Main Content */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* ✅ Mobile View (below 1024px): gantian tampilan */}
+        {isMobile ? (
+          selectedChat ? (
+            <div className="flex-1 flex flex-col border-x bg-gray-50 relative">
+              <ChatWindow
+                chat={selectedChat}
+                onStatusChange={handleStatusChange}
+                onBack={isMobile ? handleBackToList : undefined}
+              />
+            </div>
+          ) : (
+            <div className="w-full h-full border-r">
+              <ChatSidebar
+                chats={chats}
+                selectedId={selectedId}
+                onSelect={handleSelectChat}
+                globalSearch={searchQuery}
+              />
+            </div>
+          )
+        ) : (
+          // ✅ Desktop View (≥1024px): 3 kolom normal
+          <>
+            <div className="w-full sm:w-1/3 lg:w-1/4 border-r">
+              <ChatSidebar
+                chats={chats}
+                selectedId={selectedId}
+                onSelect={handleSelectChat}
+                globalSearch={searchQuery}
+              />
+            </div>
+
+            <div
+              className={`flex-1 border-x bg-gray-50 ${
+                state === "expanded" ? "ml-4" : ""
+              }`}
+            >
+              <ChatWindow
+                chat={selectedChat}
+                onStatusChange={handleStatusChange}
+                onBack={isMobile ? handleBackToList : undefined}
+              />
+            </div>
+
+            <div className="hidden xl:block xl:w-1/4 border-l">
+              <ChatInfoPanel chat={selectedChat} />
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
