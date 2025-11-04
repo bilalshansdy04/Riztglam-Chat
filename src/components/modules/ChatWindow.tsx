@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { Chat } from "@/data/dummyChats";
+import { SendHorizontal } from "lucide-react";
 
 interface ChatWindowProps {
   chat: Chat | null;
@@ -8,12 +9,13 @@ interface ChatWindowProps {
 }
 
 export function ChatWindow({ chat, onStatusChange }: ChatWindowProps) {
-  if (!chat)
+  if (!chat || !chat.messages) {
     return (
       <div className="flex items-center justify-center h-full text-gray-400">
         Pilih chat di sebelah kiri
       </div>
     );
+  }
 
   return (
     <div className="flex flex-col h-full">
@@ -24,10 +26,17 @@ export function ChatWindow({ chat, onStatusChange }: ChatWindowProps) {
           <p className="text-sm text-gray-500">{chat.status}</p>
         </div>
         <div className="space-x-2">
-          <Button variant="outline" onClick={() => onStatusChange("Assigned to Human")}>
+          <Button
+            variant="outline"
+            onClick={() => onStatusChange("Assigned to Human")}
+          >
             Assign
           </Button>
-          <Button variant="secondary" className="bg-blue-500 text-white dark:bg-blue-600 hover:bg-blue-700" onClick={() => onStatusChange("Handled by AI")}>
+          <Button
+            variant="secondary"
+            className="bg-blue-500 text-white dark:bg-blue-600 hover:bg-blue-700"
+            onClick={() => onStatusChange("Handled by AI")}
+          >
             Unassign
           </Button>
         </div>
@@ -35,40 +44,50 @@ export function ChatWindow({ chat, onStatusChange }: ChatWindowProps) {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 bg-gray-50 space-y-3">
-        {chat.messages.map((m, i) => (
-          <div
-            key={i}
-            className={`flex ${m.from === "user" ? "justify-start" : "justify-end"}`}
-          >
-            <div
-              className={`px-3 py-2 rounded-lg max-w-xs ${
-                m.from === "user"
-                  ? "bg-white border text-gray-800"
-                  : "bg-blue-500 text-white"
-              }`}
-            >
-              {m.text}
-            </div>
+        {chat.messages.length === 0 ? (
+          <div className="flex items-center justify-center h-full text-gray-400">
+            Belum ada pesan
           </div>
-        ))}
+        ) : (
+          <>
+            {chat.messages.map((m, i) => (
+              <div
+                key={i}
+                className={`flex ${
+                  m.from === "user" ? "justify-start" : "justify-end"
+                }`}
+              >
+                <div
+                  className={`px-3 py-2 rounded-lg max-w-xs ${
+                    m.from === "user"
+                      ? "bg-white border text-gray-800"
+                      : "bg-blue-500 text-white"
+                  }`}
+                >
+                  {m.text}
+                </div>
+              </div>
+            ))}
 
-        {/* System Messages */}
-        {chat.systemMessages?.map((msg, i) => (
-          <div
-            key={`sys-${i}`}
-            className="text-center text-xs text-gray-500 italic select-none"
-          >
-            {msg}
-          </div>
-        ))}
+            {/* System Messages */}
+            {chat.systemMessages?.map((msg, i) => (
+              <div
+                key={`sys-${i}`}
+                className="text-center text-xs text-gray-500 italic select-none"
+              >
+                {msg}
+              </div>
+            ))}
+          </>
+        )}
       </div>
 
       {/* Input */}
-      <div className="p-3 border-t bg-white flex items-center space-x-2">
+      <div className="p-3 border-t bg-white flex items-center space-x-2 ">
         <Input placeholder="Ketik pesan..." className="flex-1" />
-        <Button variant="ghost" className=""><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path fill-rule="evenodd" clip-rule="evenodd" d="M17.174 3.21582C17.0471 3.05402 16.8987 2.91008 16.7328 2.78793C16.3658 2.5177 15.7956 2.40792 14.6345 2.62518C13.4793 2.84133 11.949 3.33697 9.81197 4.03142L8.64277 4.41136C6.63988 5.06222 5.19647 5.53232 4.18845 5.97951C3.14977 6.4403 2.78905 6.78975 2.67073 7.07402C2.50187 7.47974 2.47484 7.92995 2.59398 8.3527C2.67745 8.64891 2.99382 9.03843 3.97003 9.61845C4.83577 10.1328 6.06022 10.7091 7.72301 11.478L10.4809 8.73969C10.7779 8.44484 11.2594 8.44484 11.5563 8.73969C11.8533 9.03454 11.8533 9.51259 11.5563 9.80745L8.79841 12.5457C9.52347 14.0914 10.0682 15.2331 10.5497 16.0481C11.0974 16.9752 11.4601 17.2891 11.7247 17.3806C12.2378 17.5582 12.802 17.5182 13.2845 17.2701C13.5334 17.1421 13.8474 16.7804 14.257 15.7854C14.6533 14.8228 15.0688 13.4577 15.6433 11.5661L16.0841 10.1146C16.7332 7.97713 17.1964 6.44653 17.387 5.29483C17.5785 4.13719 17.4546 3.57378 17.174 3.21582ZM7.31212 12.9537C8.08156 14.5959 8.68978 15.8845 9.23787 16.8121C9.79565 17.7562 10.3957 18.5199 11.2242 18.8065C12.1321 19.1207 13.1302 19.05 13.9839 18.611C14.763 18.2104 15.2477 17.3699 15.6648 16.3568C16.0919 15.3193 16.5276 13.8846 17.0863 12.0449L17.5577 10.4929C18.1855 8.42558 18.6791 6.80044 18.8877 5.53964C19.0973 4.27308 19.0595 3.16234 18.374 2.28817C18.1625 2.01851 17.9152 1.7786 17.6387 1.57503C16.7424 0.915109 15.6232 0.903568 14.3528 1.14128C13.0882 1.3779 11.4634 1.9059 9.39655 2.57756L8.12265 2.99153C6.1767 3.62387 4.65726 4.11762 3.56804 4.60084C2.50073 5.07433 1.62801 5.62553 1.26517 6.4973C0.96641 7.21511 0.918598 8.01163 1.12938 8.75958C1.38537 9.66798 2.18597 10.3182 3.18908 10.9142C4.17446 11.4997 5.55445 12.1418 7.31212 12.9537Z" fill="#201F29"></path>
-</svg></Button>
+        <Button variant="ghost" className="">
+          <SendHorizontal/>
+        </Button>
       </div>
     </div>
   );
