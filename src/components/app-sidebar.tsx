@@ -134,18 +134,27 @@ export function AppSidebar() {
                 <Separator className="my-2" />
 
                 {/* Tombol Aksi */}
-                <Button
-                  variant="destructive"
-                  onClick={() => {
-                    localStorage.removeItem("quickChats");
-                    localStorage.removeItem("chats");
-                    window.location.reload();
-                  }}
-                >
-                  Reset Local Data
-                </Button>
-
                 <div className="flex flex-col space-y-2">
+                  <Button
+                    variant="destructive"
+                    onClick={() => {
+                      localStorage.removeItem("quickChats");
+                      localStorage.removeItem("chats");
+                      window.location.reload();
+                    }}
+                  >
+                    Reset Local Data
+                  </Button>{" "}
+                  <Button
+                    variant="destructive"
+                    onClick={() => {
+                      localStorage.removeItem("quickChats");
+                      localStorage.removeItem("chats");
+                      window.location.reload();
+                    }}
+                  >
+                    Reset Local Data
+                  </Button>
                   <Button
                     variant="outline"
                     size="sm"
@@ -154,7 +163,6 @@ export function AppSidebar() {
                     <Lock className="w-4 h-4" />
                     Reset Password
                   </Button>
-
                   <Button
                     variant="destructive"
                     size="sm"
