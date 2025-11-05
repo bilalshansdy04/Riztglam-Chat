@@ -5,6 +5,7 @@ import { HeaderBar } from "@/components/modules/HeaderBar";
 import { StatusProvider } from "@/context/StatusContext";
 import Chats from "@/pages/Chats";
 import Login from "@/pages/Login";
+import QuickChats from "./pages/QuickChats";
 
 export default function App() {
   return (
@@ -19,6 +20,7 @@ export default function App() {
                 <Routes>
                   <Route path="/" element={<Login />} />
                   <Route path="/chats" element={<Chats />} />
+                  <Route path="/quick-chats" element={<QuickChats />} />
                 </Routes>
               </main>
             </div>
