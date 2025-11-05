@@ -144,16 +144,6 @@ export function AppSidebar() {
                     }}
                   >
                     Reset Local Data
-                  </Button>{" "}
-                  <Button
-                    variant="destructive"
-                    onClick={() => {
-                      localStorage.removeItem("quickChats");
-                      localStorage.removeItem("chats");
-                      window.location.reload();
-                    }}
-                  >
-                    Reset Local Data
                   </Button>
                   <Button
                     variant="outline"
