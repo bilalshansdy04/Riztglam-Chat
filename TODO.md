@@ -1,0 +1,4 @@
+- [ ] Import useSidebar hook in ChatSidebar.tsx
+- [ ] Use useSidebar to get the sidebar state
+- [ ] Conditionally add pr-4 class to the ScrollArea inner div when sidebar is expanded
+- [ ] Test the layout changes when sidebar is open and closed
