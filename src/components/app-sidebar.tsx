@@ -17,6 +17,7 @@ import {
   User,
   LogOut,
   Lock,
+  CornerUpLeft,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import {
@@ -41,6 +42,7 @@ export function AppSidebar() {
   const navItems = [
     { to: "/", label: "Home", icon: Home },
     { to: "/chats", label: "All Chats", icon: MessageCircle },
+    { to: "/quick-chats", label: "Quick Chats", icon: CornerUpLeft },
   ];
 
   return (

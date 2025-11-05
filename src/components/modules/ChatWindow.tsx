@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { Chat } from "@/data/dummyChats";
+import { quickChatsDummy, type QuickChat } from "@/data/quickchat";
 import { SendHorizontal, Info, ArrowLeft, CheckCircle } from "lucide-react";
 import {
   Sheet,
@@ -11,7 +12,11 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { ChatInfoPanel } from "@/components/modules/ChatInfoPanel";
-import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
 
 interface ChatWindowProps {
   chat: Chat | null;
@@ -21,8 +26,71 @@ interface ChatWindowProps {
 
 export function ChatWindow({ chat, onStatusChange, onBack }: ChatWindowProps) {
   const [isInfoOpen, setIsInfoOpen] = useState(false);
+  const [input, setInput] = useState("");
+  const [suggestedQuickChats, setSuggestedQuickChats] = useState<QuickChat[]>(
+    []
+  );
 
-  if (!chat || !chat.messages) {
+  // ✅ Load quick chat dari localStorage
+  const [quickChats] = useState<QuickChat[]>(() => {
+    const stored = localStorage.getItem("quickChats");
+    return stored ? JSON.parse(stored) : quickChatsDummy;
+  });
+
+  // ✅ Load chat history dari localStorage
+  const [localChats, setLocalChats] = useState<Record<number, Chat>>(() => {
+    const stored = localStorage.getItem("chats");
+    return stored ? JSON.parse(stored) : {};
+  });
+
+  // ✅ Sync ke localStorage setiap kali localChats berubah
+  useEffect(() => {
+    localStorage.setItem("chats", JSON.stringify(localChats));
+  }, [localChats]);
+
+  // ✅ Update suggestions berdasarkan "/"
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setInput(val);
+
+    if (val.startsWith("/")) {
+      const keyword = val.slice(1).toLowerCase(); // buang "/"
+      const matches = quickChats.filter((q) =>
+        q.title.toLowerCase().includes(keyword)
+      );
+      setSuggestedQuickChats(matches);
+    } else {
+      setSuggestedQuickChats([]);
+    }
+  };
+
+  // ✅ Kirim pesan (user → message list + localStorage)
+  const handleSendMessage = () => {
+    if (!chat || !input.trim()) return;
+
+    const newMessage: { from: "user" | "ai" | "human"; text: string } = {
+      from: "human",
+      text: input,
+    };
+    const updatedChat: Chat = {
+      ...chat,
+      messages: [...chat.messages, newMessage],
+    };
+
+    // Simpan ke state lokal & localStorage
+    setLocalChats((prev) => ({
+      ...prev,
+      [chat.id]: updatedChat,
+    }));
+
+    setInput("");
+    setSuggestedQuickChats([]);
+  };
+
+  // ✅ Tentukan data chat yang aktif (dari localStorage kalau ada)
+  const currentChat = localChats[chat?.id || -1] || chat;
+
+  if (!currentChat || !currentChat.messages) {
     return (
       <div className="flex items-center justify-center h-full text-gray-400">
         Pilih chat di sebelah kiri
@@ -35,7 +103,6 @@ export function ChatWindow({ chat, onStatusChange, onBack }: ChatWindowProps) {
       {/* Header Chat */}
       <div className="p-3 border-b bg-white flex justify-between items-center">
         <div className="flex items-center gap-2">
-          {/* Tombol Back (mobile only) */}
           <Button
             variant="ghost"
             size="icon"
@@ -46,13 +113,12 @@ export function ChatWindow({ chat, onStatusChange, onBack }: ChatWindowProps) {
           </Button>
 
           <div>
-            <h3 className="font-semibold">{chat.name}</h3>
-            <p className="text-sm text-gray-500">{chat.status}</p>
+            <h3 className="font-semibold">{currentChat.name}</h3>
+            <p className="text-sm text-gray-500">{currentChat.status}</p>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
-          {/* 🔹 Tombol Resolve dengan Tooltip */}
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -65,7 +131,7 @@ export function ChatWindow({ chat, onStatusChange, onBack }: ChatWindowProps) {
             </TooltipTrigger>
             <TooltipContent>Resolve chat</TooltipContent>
           </Tooltip>
-          {/* Tombol Assign */}
+
           <Button
             variant="outline"
             onClick={() => onStatusChange("Assigned to Human")}
@@ -73,7 +139,6 @@ export function ChatWindow({ chat, onStatusChange, onBack }: ChatWindowProps) {
             Assign
           </Button>
 
-          {/* Tombol Unassign */}
           <Button
             variant="secondary"
             className="bg-blue-500 text-white dark:bg-blue-600 hover:bg-blue-700"
@@ -82,8 +147,6 @@ export function ChatWindow({ chat, onStatusChange, onBack }: ChatWindowProps) {
             Unassign
           </Button>
 
-
-          {/* Tombol Info (hanya tampil jika layar < 1280px) */}
           <div className="block xl:hidden">
             <Sheet open={isInfoOpen} onOpenChange={setIsInfoOpen}>
               <SheetTrigger asChild>
@@ -96,7 +159,7 @@ export function ChatWindow({ chat, onStatusChange, onBack }: ChatWindowProps) {
                   <SheetTitle>Info Chat</SheetTitle>
                 </SheetHeader>
                 <div className="h-full overflow-y-auto">
-                  <ChatInfoPanel chat={chat} />
+                  <ChatInfoPanel chat={currentChat} />
                 </div>
               </SheetContent>
             </Sheet>
@@ -106,50 +169,62 @@ export function ChatWindow({ chat, onStatusChange, onBack }: ChatWindowProps) {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 bg-gray-50 space-y-3">
-        {chat.messages.length === 0 ? (
+        {currentChat.messages.length === 0 ? (
           <div className="flex items-center justify-center h-full text-gray-400">
             Belum ada pesan
           </div>
         ) : (
-          <>
-            {chat.messages.map((m, i) => (
+          currentChat.messages.map((m, i) => (
+            <div
+              key={i}
+              className={`flex ${
+                m.from === "user" ? "justify-start" : "justify-end"
+              }`}
+            >
               <div
-                key={i}
-                className={`flex ${
-                  m.from === "user" ? "justify-start" : "justify-end"
+                className={`px-3 py-2 rounded-lg max-w-xs ${
+                  m.from === "user"
+                    ? "bg-white border text-gray-800"
+                    : "bg-blue-500 text-white"
                 }`}
               >
-                <div
-                  className={`px-3 py-2 rounded-lg max-w-xs ${
-                    m.from === "user"
-                      ? "bg-white border text-gray-800"
-                      : "bg-blue-500 text-white"
-                  }`}
-                >
-                  {m.text}
-                </div>
+                {m.text}
               </div>
-            ))}
-
-            {/* System Messages */}
-            {chat.systemMessages?.map((msg, i) => (
-              <div
-                key={`sys-${i}`}
-                className="text-center text-xs text-gray-500 italic select-none"
-              >
-                {msg}
-              </div>
-            ))}
-          </>
+            </div>
+          ))
         )}
       </div>
 
       {/* Input */}
-      <div className="p-3 border-t bg-white flex items-center space-x-2">
-        <Input placeholder="Ketik pesan..." className="flex-1" />
-        <Button variant="ghost">
-          <SendHorizontal />
-        </Button>
+      <div className="p-3 border-t bg-white flex flex-col space-y-2">
+        {suggestedQuickChats.length > 0 && (
+          <div className="max-h-32 overflow-y-auto border rounded p-2 bg-gray-50 text-sm">
+            {suggestedQuickChats.map((q) => (
+              <div
+                key={q.id}
+                className="p-1 hover:bg-blue-100 rounded cursor-pointer"
+                onClick={() => {
+                  setInput(q.content);
+                  setSuggestedQuickChats([]);
+                }}
+              >
+                <strong>{q.title}</strong> — {q.content}
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="flex items-center space-x-2">
+          <Input
+            placeholder="Ketik pesan..."
+            className="flex-1"
+            value={input}
+            onChange={handleInputChange}
+          />
+          <Button variant="ghost" onClick={handleSendMessage}>
+            <SendHorizontal />
+          </Button>
+        </div>
       </div>
     </div>
   );
