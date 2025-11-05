@@ -3,11 +3,16 @@ import { createRoot } from 'react-dom/client'
 import './input.css'
 import App from './App.tsx'
 
-if (import.meta.env.DEV) {
+const APP_VERSION = "1.0.0";
+
+const storedVersion = localStorage.getItem("appVersion");
+if (storedVersion !== APP_VERSION) {
   localStorage.removeItem("quickChats");
   localStorage.removeItem("chats");
-  console.log("🧹 Cleared quickChats from localStorage");
+  localStorage.setItem("appVersion", APP_VERSION);
+  console.log("🧹 Data cleared because version changed");
 }
+
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

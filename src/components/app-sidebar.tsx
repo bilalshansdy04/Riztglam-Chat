@@ -25,11 +25,7 @@ import {
   PopoverTrigger,
   PopoverContent,
 } from "@/components/ui/popover";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
@@ -37,8 +33,8 @@ import { useStatus } from "@/context/StatusContext";
 
 export function AppSidebar() {
   const location = useLocation();
-  const { isOnline, setIsOnline } = useStatus();; 
-  
+  const { isOnline, setIsOnline } = useStatus();
+
   const navItems = [
     { to: "/", label: "Home", icon: Home },
     { to: "/chats", label: "All Chats", icon: MessageCircle },
@@ -58,9 +54,7 @@ export function AppSidebar() {
             <SidebarMenuButton>
               <SidebarTrigger />
               <Bot />
-              <h2 className="text-lg font-semibold px-4 py-2">
-                Ritzglam Chat
-              </h2>
+              <h2 className="text-lg font-semibold px-4 py-2">Ritzglam Chat</h2>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -123,9 +117,7 @@ export function AppSidebar() {
                     <p className="font-medium text-gray-900 text-sm">
                       Bilal Shandyarta
                     </p>
-                    <p className="text-xs text-gray-500">
-                      bilal@ritzglam.id
-                    </p>
+                    <p className="text-xs text-gray-500">bilal@ritzglam.id</p>
                   </div>
                 </div>
 
@@ -136,15 +128,23 @@ export function AppSidebar() {
                   <span className="text-sm text-gray-700">
                     {isOnline ? "Online" : "Offline"}
                   </span>
-                  <Switch
-                    checked={isOnline}
-                    onCheckedChange={setIsOnline}
-                  />
+                  <Switch checked={isOnline} onCheckedChange={setIsOnline} />
                 </div>
 
                 <Separator className="my-2" />
 
                 {/* Tombol Aksi */}
+                <Button
+                  variant="destructive"
+                  onClick={() => {
+                    localStorage.removeItem("quickChats");
+                    localStorage.removeItem("chats");
+                    window.location.reload();
+                  }}
+                >
+                  Reset Local Data
+                </Button>
+
                 <div className="flex flex-col space-y-2">
                   <Button
                     variant="outline"

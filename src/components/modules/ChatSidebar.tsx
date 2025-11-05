@@ -19,7 +19,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { CircleCheck, Filter, Mail, MailOpen } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { useSidebar } from "@/components/ui/sidebar";
 
 interface ChatSidebarProps {
   chats: Chat[];
@@ -37,8 +36,7 @@ export function ChatSidebar({
   const [tab, setTab] = useState("assigned");
   const [localSearch, setLocalSearch] = useState("");
   const [selectedAgent, setSelectedAgent] = useState<string>("All Agents");
-  const [showUnreadOnly, setShowUnreadOnly] = useState(false); // 👈 new state
-  const { state } = useSidebar();
+  const [showUnreadOnly, setShowUnreadOnly] = useState(false);
 
   const searchTerm = globalSearch || localSearch;
 

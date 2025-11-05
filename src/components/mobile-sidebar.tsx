@@ -1,4 +1,4 @@
-import { Home, MessageCircle, Bot } from "lucide-react";
+import { Home, MessageCircle, Bot, CornerUpLeft } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 export function MobileSidebar() {
@@ -7,6 +7,7 @@ export function MobileSidebar() {
   const navItems = [
     { to: "/", label: "Home", icon: Home },
     { to: "/chats", label: "All Chats", icon: MessageCircle },
+    { to: "/quick-chats", label: "Quick Chats", icon: CornerUpLeft },
   ];
 
   return (
